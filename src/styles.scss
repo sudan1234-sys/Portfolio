@@ -1,1 +1,53 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.scss or app.component.scss */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden; // Add overflow control to root element
+  width: 100%;        // Ensure html fills viewport
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+  background-color: black;
+  overflow-x: hidden;
+  width: 100%;        // Ensure body fills html container
+  position: relative; // Establish positioning context
+}
+
+.vanta-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 760px;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.maincontent {
+  position: relative;
+  z-index: 1;
+  background-color: black;
+  overflow-x: hidden; // Contain child overflow
+  width: 100%;        // Ensure it stays within viewport
+}
+
+// Add this rule to handle all direct children
+body > * {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 600px) {
+  body, html {
+    overflow-x: hidden;
+  }
+  
+  // Add mobile-specific fixes
+  .vanta-container,
+  .maincontent {
+    width: 100vw; // Use viewport units
+    overflow-x: hidden;
+  }
+}
