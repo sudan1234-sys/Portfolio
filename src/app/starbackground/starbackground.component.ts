@@ -1,44 +1,38 @@
-import { AfterViewInit, Component, OnDestroy, ElementRef, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ElementRef, ViewChild, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import * as THREE from 'three';
 
 @Component({
   selector: 'app-starbackground',
-  template: '<div #vantaBg class="vanta-container"></div>',
-  styleUrls: ['./starbackground.component.scss']
+  template: '<div #vantaBg class="vanta-container"></div>'
 })
 export class StarbackgroundComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('vantaBg', { static: true }) vantaBg!: ElementRef;
+  @ViewChild('vantaBg') vantaBg!: ElementRef;
   vantaEffect: any;
 
-  async ngAfterViewInit() {
-    await this.initVanta();
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) { // ← MOST IMPORTANT LINE
+      this.initVanta();
+    }
   }
 
   async initVanta() {
-    // Set THREE to global scope first
+    // 1. Set THREE globally
     (window as any).THREE = THREE;
-
-    // Dynamically import Vanta after setting global THREE
+    
+    // 2. Dynamic import
     const DOTS = (await import('vanta/dist/vanta.net.min')).default;
-
+    
+    // 3. Initialize with explicit THREE reference
     this.vantaEffect = DOTS({
       el: this.vantaBg.nativeElement,
+      THREE: THREE, // ← MUST PASS EXPLICITLY
       mouseControls: true,
       touchControls: true,
-      gyroControls: false,
-      minHeight: 200,
-      minWidth: 200,
-      scale: 1,
-      scaleMobile: 1,
-      color: 0xffffff,
-      backgroundColor: 0x000000,
-      backgroundAlpha: 1.0,
-      spacing: 20
+      backgroundColor: 0x000000
     });
-
-    if (this.vantaEffect?.renderer) {
-      this.vantaEffect.renderer.setClearColor(0x000000, 1);
-    }
   }
 
   ngOnDestroy() {
