@@ -1,5 +1,7 @@
 import { AfterViewInit, Component, OnDestroy, ElementRef, ViewChild, Inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import * as THREE from 'three';
+import NET from 'vanta/dist/vanta.net.min';
 
 @Component({
   selector: 'app-starbackground',
@@ -12,28 +14,17 @@ export class StarbackgroundComponent implements AfterViewInit, OnDestroy {
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
 
-  async ngAfterViewInit() {
+  ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      await this.initVanta();
+      this.initVanta();
     }
   }
 
-  async initVanta() {
+  initVanta() {
     try {
-      // 1️⃣ Dynamically load THREE and attach to window (Vanta requires this)
-      const THREE = await import('three');
-      (window as any).THREE = THREE;
-
-      // 2️⃣ Import Vanta module
-      const VANTA = await import('vanta/dist/vanta.net.min');
-
-      // 3️⃣ Compatibility fix: handle .default export vs. direct export
-      const NET = VANTA.default || VANTA;
-
-      // 4️⃣ Initialize
       this.vantaEffect = NET({
         el: this.vantaBg.nativeElement,
-        THREE: THREE,             // Always pass THREE explicitly
+        THREE,
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
