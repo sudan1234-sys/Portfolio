@@ -20,17 +20,20 @@ export class StarbackgroundComponent implements AfterViewInit, OnDestroy {
 
   async initVanta() {
     try {
-      // 1️⃣ Dynamically load THREE and set globally
-      const THREE = (await import('three'));
+      // 1️⃣ Dynamically load THREE and attach to window (Vanta requires this)
+      const THREE = await import('three');
       (window as any).THREE = THREE;
 
-      // 2️⃣ Now import VANTA (must come after THREE)
-      const NET = (await import('vanta/dist/vanta.net.min')).default;
+      // 2️⃣ Import Vanta module
+      const VANTA = await import('vanta/dist/vanta.net.min');
 
-      // 3️⃣ Initialize VANTA
+      // 3️⃣ Compatibility fix: handle .default export vs. direct export
+      const NET = VANTA.default || VANTA;
+
+      // 4️⃣ Initialize
       this.vantaEffect = NET({
         el: this.vantaBg.nativeElement,
-        THREE: THREE, // Explicitly pass
+        THREE: THREE,             // Always pass THREE explicitly
         mouseControls: true,
         touchControls: true,
         gyroControls: false,
