@@ -1,41 +1,64 @@
-import { AfterViewInit, Component, OnDestroy, ElementRef, ViewChild, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { AfterViewInit, Component, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import * as THREE from 'three';
 
 @Component({
   selector: 'app-starbackground',
-  template: '<div #vantaBg class="vanta-container"></div>'
+  template: '<div #vantaBg class="vanta-container"></div>',
+  styleUrls: ['./starbackground.component.scss']
 })
 export class StarbackgroundComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('vantaBg') vantaBg!: ElementRef;
+  @ViewChild('vantaBg', { static: true }) vantaBg!: ElementRef;
   vantaEffect: any;
-
-  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+  resizeObserver!: ResizeObserver;
 
   ngAfterViewInit() {
-    if (isPlatformBrowser(this.platformId)) { // ← MOST IMPORTANT LINE
-      this.initVanta();
-    }
+    this.initVanta();
   }
 
   async initVanta() {
-    // 1. Set THREE globally
-    (window as any).THREE = THREE;
-    
-    // 2. Dynamic import
+    // Ensure THREE is globally available
+    if (typeof window !== 'undefined') {
+      (window as any).THREE = THREE;
+    }
+
+    // Load Vanta dynamically
     const DOTS = (await import('vanta/dist/vanta.net.min')).default;
-    
-    // 3. Initialize with explicit THREE reference
+
     this.vantaEffect = DOTS({
       el: this.vantaBg.nativeElement,
-      THREE: THREE, // ← MUST PASS EXPLICITLY
+      THREE: THREE, // Pass THREE directly
       mouseControls: true,
       touchControls: true,
-      backgroundColor: 0x000000
+      gyroControls: false,
+      minHeight: 200,
+      minWidth: 200,
+      scale: 1,
+      scaleMobile: 1,
+      color: 0xffffff,
+      backgroundColor: 0x000000,
+      backgroundAlpha: 1.0,
+      spacing: 20
     });
+
+    // Add resize handler
+    this.resizeObserver = new ResizeObserver(() => {
+      if (this.vantaEffect) {
+        this.vantaEffect.resize();
+        this.vantaEffect.renderer.setSize(
+          this.vantaBg.nativeElement.offsetWidth,
+          this.vantaBg.nativeElement.offsetHeight
+        );
+      }
+    });
+    this.resizeObserver.observe(this.vantaBg.nativeElement);
   }
 
   ngOnDestroy() {
-    this.vantaEffect?.destroy();
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect();
+    }
+    if (this.vantaEffect) {
+      this.vantaEffect.destroy();
+    }
   }
 }
