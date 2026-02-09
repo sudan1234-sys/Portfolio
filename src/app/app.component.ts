@@ -10,7 +10,15 @@ import emailjs from '@emailjs/browser';
 
 
 
-const projects=[{
+const projects=[
+  {
+  title: 'Jwellery Ecommerce Application',
+  description: 'Built a full-stack Jwellery Application to buy and sell jwelleries...',
+  image: 'icons/Screenshot 2026-02-09 102902.png',
+  link: 'https://jwellery-application.vercel.app/',
+  tags:['Angular','Spring Boot','Docker'],
+  },
+  {
   title: 'Real Estate Project',
   description: 'Built a full-stack property posting and bidding platform with real-time updates.',
   image: 'icons/Screenshot 2025-07-10 080424.png',
